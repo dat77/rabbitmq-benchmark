@@ -15,7 +15,9 @@ public class RetryConfig {
   public static final String RETRY_QUEUE = "perf.retry";
   public static final String DLQ_QUEUE = "perf.dlq";
 
-  public static final String RETRY_ROUTING_KEY = "retry";
+  public static final String RETRY_DIRECT_ROUTING_KEY = "retry.direct";
+
+
   public static final String DLQ_ROUTING_KEY = "dlq";
 
   @Bean
@@ -23,8 +25,10 @@ public class RetryConfig {
     return new DirectExchange(DLX_EXCHANGE);
   }
 
+  // DIRECT
+
   @Bean
-  public Queue retryQueue() {
+  public Queue retryDirectQueue() {
     return QueueBuilder.durable(RETRY_QUEUE)
         .withArgument("x-message-ttl", 5000) // 5 sec delay
         .withArgument("x-dead-letter-exchange", RabbitConfig.DIRECT_EXCHANGE)
@@ -33,13 +37,21 @@ public class RetryConfig {
   }
 
   @Bean
-  public Queue dlqQueue() {
-    return QueueBuilder.durable(DLQ_QUEUE).build();
+  public Binding retryDirectBinding(Queue retryDirectQueue, DirectExchange dlxExchange) {
+    return BindingBuilder.bind(retryDirectQueue).to(dlxExchange).with(RETRY_DIRECT_ROUTING_KEY);
   }
 
+  // FANOUT
+
+
+  // TOPIC
+
+
+  // DLQ
+
   @Bean
-  public Binding retryBinding(Queue retryQueue, DirectExchange dlxExchange) {
-    return BindingBuilder.bind(retryQueue).to(dlxExchange).with(RETRY_ROUTING_KEY);
+  public Queue dlqQueue() {
+    return QueueBuilder.durable(DLQ_QUEUE).build();
   }
 
   @Bean
