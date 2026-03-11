@@ -22,12 +22,9 @@ public class PerfProducer {
     };
     long start = System.nanoTime();
     for (int i = 0; i < count; i++) {
-      PerfMessage msg = new PerfMessage(
-          UUID.randomUUID().toString(),
-          "TEST",
-          PayloadFactory.payloadOfSize(size)
-      );
-      rabbitTemplate.convertAndSend(exchange, "perf.key", msg);
+      PerfMessage msg =
+          new PerfMessage(UUID.randomUUID().toString(),"TEST",PayloadFactory.payloadOfSize(size));
+      rabbitTemplate.convertAndSend(exchange, RabbitConfig.DIRECT_ROUTING_KEY, msg);
     }
     long end = System.nanoTime();
     return "Sent %d messages in %d ms".formatted(count, (end - start) / 1_000_000);

@@ -2,7 +2,6 @@ package com.example.rabbimmq_demo.rabbit.consumers;
 
 import com.example.rabbimmq_demo.rabbit.config.RabbitConfig;
 import com.example.rabbimmq_demo.rabbit.entities.PerfMessage;
-import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -23,7 +22,7 @@ public class PerfListener {
     if (c == 1) {
       startTime.compareAndSet(0, System.nanoTime());
     }
-    Thread.sleep(Duration.ofMillis(100));
+    Thread.sleep(100L);
   }
 
   public void reset() {

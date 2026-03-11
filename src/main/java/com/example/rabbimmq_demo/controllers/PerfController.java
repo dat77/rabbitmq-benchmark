@@ -1,6 +1,5 @@
 package com.example.rabbimmq_demo.controllers;
 
-import com.example.rabbimmq_demo.rabbit.config.RabbitConfig;
 import com.example.rabbimmq_demo.rabbit.producers.PerfProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
