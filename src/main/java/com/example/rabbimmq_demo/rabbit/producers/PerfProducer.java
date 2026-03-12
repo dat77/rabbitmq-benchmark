@@ -20,11 +20,18 @@ public class PerfProducer {
       case "direct" -> RabbitConfig.DIRECT_EXCHANGE;
       default       -> throw new IllegalArgumentException("Unknown exchangeType: " + exchangeType);
     };
+    String routingKey = switch (exchangeType) {
+      case "fanout" -> null;
+      case "topic"  -> RabbitConfig.TOPIC_ROUTING_KEY;
+      case "direct" -> RabbitConfig.DIRECT_ROUTING_KEY;
+      default       -> throw new IllegalArgumentException("Unknown exchangeType: " + exchangeType);
+    };
+
     long start = System.nanoTime();
     for (int i = 0; i < count; i++) {
       PerfMessage msg =
-          new PerfMessage(UUID.randomUUID().toString(),"TEST",PayloadFactory.payloadOfSize(size));
-      rabbitTemplate.convertAndSend(exchange, RabbitConfig.DIRECT_ROUTING_KEY, msg);
+          new PerfMessage(UUID.randomUUID().toString(),"TEST", PayloadFactory.payloadOfSize(size));
+      rabbitTemplate.convertAndSend(exchange, routingKey, msg);
     }
     long end = System.nanoTime();
     return "Sent %d messages in %d ms".formatted(count, (end - start) / 1_000_000);

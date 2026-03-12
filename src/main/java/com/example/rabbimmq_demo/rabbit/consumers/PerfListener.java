@@ -2,27 +2,37 @@ package com.example.rabbimmq_demo.rabbit.consumers;
 
 import com.example.rabbimmq_demo.rabbit.config.RabbitConfig;
 import com.example.rabbimmq_demo.rabbit.entities.PerfMessage;
+import com.rabbitmq.client.Channel;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PerfListener {
 
   private final AtomicLong counter = new AtomicLong();
   private final AtomicLong startTime = new AtomicLong();
 
   @RabbitListener(queues = RabbitConfig.QUEUE_NAME)
-  @SneakyThrows
-  public void handle(PerfMessage message) {
-    long c = counter.incrementAndGet();
-    if (c == 1) {
-      startTime.compareAndSet(0, System.nanoTime());
+  public void handle(PerfMessage msg, Message message, Channel channel,
+      @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws Exception {
+    try {
+      long c = counter.incrementAndGet();
+      if (c == 1) {
+        startTime.compareAndSet(0, System.nanoTime());
+      }
+      channel.basicAck(tag, false);
+      // log.info("Thread {} processed {}", Thread.currentThread().getName(), msg.id());
+    } catch (Exception e) {
+      channel.basicNack(tag, false, false); // send to DLX if configured
     }
-    Thread.sleep(100L);
   }
 
   public void reset() {
