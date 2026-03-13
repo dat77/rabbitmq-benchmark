@@ -17,8 +17,9 @@ public class RetryConfig {
 
   public static final String RETRY_DIRECT_ROUTING_KEY = "retry.direct";
 
-
   public static final String DLQ_ROUTING_KEY = "dlq";
+
+  public static final int MAX_RETRIES = 3;
 
   @Bean
   public DirectExchange dlxExchange() {
